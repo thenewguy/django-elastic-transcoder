@@ -16,9 +16,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires = [
-        "django >= 1.4",
+        "django >= 1.7",
         "boto >= 2.5",
-        "South >= 0.8",
     ],
     classifiers=[
         "Intended Audience :: Developers",

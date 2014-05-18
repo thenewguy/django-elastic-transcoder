@@ -6,7 +6,7 @@ from optparse import make_option
 from uuid import uuid4
 
 REGION_MAP = dict([(getattr(Location, i) or "us-east-1", getattr(Location, i)) for i in dir(Location) if i[0].isupper()])
-VALID_REGIONS = tuple(REGION_MAP.keys())
+VALID_REGIONS = set(REGION_MAP.keys())
 
 class Command(BaseCommand):
     help = 'Creates an S3 bucket'

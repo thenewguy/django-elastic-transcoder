@@ -2,7 +2,7 @@ from boto import elastictranscoder
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 
-VALID_REGIONS = tuple([r.name for r in elastictranscoder.regions()])
+VALID_REGIONS = set([r.name for r in elastictranscoder.regions()])
 
 class Command(BaseCommand):
     help = 'Tests the suitability of an IAM role for usage with elastic transcoder'

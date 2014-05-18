@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from uuid import uuid4
 
-VALID_REGIONS = tuple([r.name for r in elastictranscoder.regions()])
+VALID_REGIONS = set([r.name for r in elastictranscoder.regions()])
 
 class Command(BaseCommand):
     help = 'Updates the configuration of an elastic transcoder pipeline.  If the pipeline does not exist, it will be created.'

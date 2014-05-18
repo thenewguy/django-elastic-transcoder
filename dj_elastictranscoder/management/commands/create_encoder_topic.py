@@ -5,7 +5,7 @@ from json import dumps
 from optparse import make_option
 from uuid import uuid4
 
-VALID_REGIONS = tuple([r.name for r in sns.regions()])
+VALID_REGIONS = set([r.name for r in sns.regions()])
 
 class Command(BaseCommand):
     help = 'If the topic does not exist, it will be created.'

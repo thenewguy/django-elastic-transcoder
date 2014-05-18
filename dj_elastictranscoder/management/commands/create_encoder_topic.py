@@ -1,7 +1,6 @@
 from boto import sns
 from boto.exception import BotoServerError
 from django.core.management.base import BaseCommand, CommandError
-from django.core.urlresolvers import reverse
 from json import dumps
 from optparse import make_option
 from uuid import uuid4

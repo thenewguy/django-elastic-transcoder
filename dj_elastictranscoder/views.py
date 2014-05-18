@@ -3,6 +3,7 @@ import json
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import mail_admins
+from urllib2 import urlopen
 
 from .models import EncodeJob
 from .signals import (
@@ -26,12 +27,16 @@ def endpoint(request):
     # handle SNS subscription
     if data['Type'] == 'SubscriptionConfirmation':
         subscribe_url = data['SubscribeURL']
+        
         subscribe_body = """
+        This message serves as a fail-safe in case the automatic subscription confirmation fails. 
+        
         Please visit this URL below to confirm your subscription with SNS
 
         %s """ % subscribe_url
 
         mail_admins('Please confirm SNS subscription', subscribe_body)
+        urlopen(subscribe_url)
         return HttpResponse('OK')
 
     

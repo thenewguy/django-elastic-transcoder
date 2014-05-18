@@ -6,8 +6,7 @@ from django.core.urlresolvers import reverse
 from json import loads
 from optparse import make_option
 from StringIO import StringIO
-
-VALID_REGIONS = tuple([r.name for r in sns.regions()])
+from .create_encoder_topic import VALID_REGIONS
 
 class Command(BaseCommand):
     help = 'Subscribes the encoder endpoint to an SNS topic for use with an Elastic Transcoder Pipeline.  If the topic does not exist, it will be created as well.'

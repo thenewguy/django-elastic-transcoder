@@ -1,9 +1,11 @@
 from boto import sns
 from boto.exception import BotoServerError
+from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.urlresolvers import reverse
+from json import loads
 from optparse import make_option
-from uuid import uuid4
+from StringIO import StringIO
 
 class Command(BaseCommand):
     help = 'Subscribes the encoder endpoint to an SNS topic for use with an Elastic Transcoder Pipeline.  If the topic does not exist, it will be created as well.'
@@ -58,7 +60,7 @@ class Command(BaseCommand):
         if not protocol in ("http", "https"):
             raise CommandError("Invalid protocol specified.  You entered '%s'.  Protocol must be http or https.")
         
-        topic = kwargs["topic"] or "elastic-transcoder-{0}".format(uuid4())
+        topic = kwargs["topic"]
         alias = kwargs["alias"] or ""
         
         endpoint = "{0}://{1}{2}{3}".format(
@@ -102,43 +104,16 @@ class Command(BaseCommand):
         self.stdout.write('Creating sns connection')
         connection = sns.SNSConnection(aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
         
-        #
-        #    retrieve sns topics
-        #
-        self.stdout.write('Retrieving all sns topics')
+        out = StringIO()
+        call_command("create_encoder_topic", topic=topic, region=region, json=True, stdout=out)
+        arn = loads(out.getvalue())["arn"]
         
-        topic_arns = []
-        result = None
-        token = None
-        while result is None or token:
-            response = connection.get_all_topics(token)
-            result = response.get("ListTopicsResponse", {}).get("ListTopicsResult", {})
-            token = result.get("NextToken", None)
-            for r in result.get("Topics", []):
-                topic_arns.append(r['TopicArn'])
-        
-        topics = {}
-        for arn in topic_arns:
-            name = arn.rsplit(":", 1)[-1]
-            topics[name] = arn
-        
-        #
-        #    create topic if it does not exist
-        #
-        if not topic in topics:
-            self.stdout.write('Topic "%s" did not exist.' % topic)
-            response = connection.create_topic(topic)
-            result = response.get("CreateTopicResponse", {}).get("CreateTopicResult", {})
-            arn = result["TopicArn"]
-            topics[topic] = arn
-            self.stdout.write('Created topic with arn "%s".' % arn)
-            
         #
         #    subscribe endpoint
         #
         self.stdout.write('Subscribing %s' % endpoint)
         try:
-            connection.subscribe(topics[topic], protocol, endpoint)
+            connection.subscribe(arn, protocol, endpoint)
         except BotoServerError, e:
             raise CommandError(
                 'Attempting subscription raised the following exception:\n\tCode: {0}\n\tMessage: {1}'.format(

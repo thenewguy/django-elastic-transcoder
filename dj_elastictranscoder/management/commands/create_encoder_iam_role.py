@@ -5,7 +5,7 @@ from json import dumps
 from optparse import make_option
 from uuid import uuid4
 
-VALID_REGIONS = [r.name for r in iam.regions()]
+VALID_REGIONS = tuple([r.name for r in iam.regions()])
 
 class Command(BaseCommand):
     help = 'Creates an IAM role for the Elastic Transcoder Service to use'

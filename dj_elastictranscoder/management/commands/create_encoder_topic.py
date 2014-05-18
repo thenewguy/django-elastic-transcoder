@@ -6,6 +6,8 @@ from json import dumps
 from optparse import make_option
 from uuid import uuid4
 
+VALID_REGIONS = tuple([r.name for r in sns.regions()])
+
 class Command(BaseCommand):
     help = 'If the topic does not exist, it will be created.'
     
@@ -18,7 +20,7 @@ class Command(BaseCommand):
         make_option(
             '--region',
             dest='region',
-            help='Run python manage.py list_sns_regions for valid choices',
+            help='One of {0}'.format(VALID_REGIONS),
         ),
         make_option(
             '--json',
@@ -34,7 +36,6 @@ class Command(BaseCommand):
         #    initial config
         #
         from django.conf import settings
-        valid_regions = [r.name for r in sns.regions()]
         
         #
         #    parse inputs
@@ -47,8 +48,8 @@ class Command(BaseCommand):
         topic = kwargs["topic"] or "elastic-transcoder-{0}".format(uuid4())
         
         region = kwargs["region"]
-        if region and region not in valid_regions:
-            raise CommandError('Invalid region specified.  Run python manage.py list_sns_regions for valid choices.')
+        if region and region not in VALID_REGIONS:
+            raise CommandError('Invalid region specified.  Region must be one of {0}.'.format(VALID_REGIONS))
         
         #
         #    reference settings
@@ -66,8 +67,8 @@ class Command(BaseCommand):
             region = getattr(settings, 'AWS_REGION', None)
             
             if region:
-                if region not in valid_regions:
-                    raise CommandError('Invalid region specified as AWS_REGION on the settings module.  Run python manage.py list_sns_regions for valid choices.')
+                if region not in VALID_REGIONS:
+                    raise CommandError('Invalid region specified as AWS_REGION on the settings module.  Region must be one of {0}.'.format(VALID_REGIONS))
             else:
                 log('Region was not specified on the command line or on the settings module.  Proceeding without setting the sns region.  This is not recommended.')
         

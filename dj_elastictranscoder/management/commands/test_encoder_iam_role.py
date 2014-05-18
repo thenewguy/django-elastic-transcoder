@@ -2,6 +2,8 @@ from boto import elastictranscoder
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 
+VALID_REGIONS = tuple([r.name for r in elastictranscoder.regions()])
+
 class Command(BaseCommand):
     help = 'Tests the suitability of an IAM role for usage with elastic transcoder'
     
@@ -9,7 +11,7 @@ class Command(BaseCommand):
         make_option(
             '--region',
             dest='region',
-            help='Run python manage.py list_elastic_transcoder_regions for valid choices',
+            help='One of {0}'.format(VALID_REGIONS),
         ),
         make_option(
             '--inputbucket',
@@ -38,7 +40,6 @@ class Command(BaseCommand):
         #    initial config
         #
         from django.conf import settings
-        valid_regions = [r.name for r in elastictranscoder.regions()]
         
         #
         #    parse inputs
@@ -69,8 +70,8 @@ class Command(BaseCommand):
                 raise CommandError("One of either the 'role' kwarg or 'ELASTIC_TRANSCODER_IAM_ROLE' setting is required.")
         
         region = kwargs["region"]
-        if region and region not in valid_regions:
-            raise CommandError('Invalid region specified.  Run python manage.py list_elastic_transcoder_regions for valid choices.')
+        if region and region not in VALID_REGIONS:
+            raise CommandError('Invalid region specified.  Region must be one of {0}.'.format(VALID_REGIONS))
         
         #
         #    reference settings
@@ -88,8 +89,8 @@ class Command(BaseCommand):
             region = getattr(settings, 'AWS_REGION', None)
             
             if region:
-                if region not in valid_regions:
-                    raise CommandError('Invalid region specified as AWS_REGION on the settings module.  Run python manage.py list_elastic_transcoder_regions for valid choices.')
+                if region not in VALID_REGIONS:
+                    raise CommandError('Invalid region specified as AWS_REGION on the settings module.  Region must be one of {0}.'.format(VALID_REGIONS))
             else:
                 self.stdout.write('Region was not specified on the command line or on the settings module.  Proceeding without setting the elastic transcoder region.  This is not recommended.')
         

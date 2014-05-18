@@ -7,6 +7,8 @@ from json import loads
 from optparse import make_option
 from StringIO import StringIO
 
+VALID_REGIONS = tuple([r.name for r in sns.regions()])
+
 class Command(BaseCommand):
     help = 'Subscribes the encoder endpoint to an SNS topic for use with an Elastic Transcoder Pipeline.  If the topic does not exist, it will be created as well.'
     
@@ -19,7 +21,7 @@ class Command(BaseCommand):
         make_option(
             '--region',
             dest='region',
-            help='Run python manage.py list_sns_regions for valid choices',
+            help='One of {0}'.format(VALID_REGIONS),
         ),
         make_option(
             '--protocol',
@@ -45,7 +47,6 @@ class Command(BaseCommand):
         #    initial config
         #
         from django.conf import settings
-        valid_regions = [r.name for r in sns.regions()]
         
         #
         #    parse inputs
@@ -71,8 +72,8 @@ class Command(BaseCommand):
         )
         
         region = kwargs["region"]
-        if region and region not in valid_regions:
-            raise CommandError('Invalid region specified.  Run python manage.py list_sns_regions for valid choices.')
+        if region and region not in VALID_REGIONS:
+            raise CommandError('Invalid region specified.  Region must be one of {0}.'.format(VALID_REGIONS))
         
         #
         #    reference settings
@@ -90,8 +91,8 @@ class Command(BaseCommand):
             region = getattr(settings, 'AWS_REGION', None)
             
             if region:
-                if region not in valid_regions:
-                    raise CommandError('Invalid region specified as AWS_REGION on the settings module.  Run python manage.py list_sns_regions for valid choices.')
+                if region not in VALID_REGIONS:
+                    raise CommandError('Invalid region specified as AWS_REGION on the settings module.  Region must be one of {0}.'.format(VALID_REGIONS))
             else:
                 self.stdout.write('Region was not specified on the command line or on the settings module.  Proceeding without setting the sns region.  This is not recommended.')
         

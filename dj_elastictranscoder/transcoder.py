@@ -50,3 +50,5 @@ class Transcoder(object):
         job.content_type = content_type
         job.object_id = obj.id
         job.save()
+        
+        return job

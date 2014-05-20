@@ -7,13 +7,11 @@ class EncodeJob(models.Model):
     STATE_SUBMITTED = 0
     STATE_PROGRESSING = 1
     STATE_ERROR = 2
-    STATE_WARNING = 3
-    STATE_COMPLETE = 4
+    STATE_COMPLETE = 3
     STATE_CHOICES = (
         (STATE_SUBMITTED, 'Submitted'),
         (STATE_PROGRESSING, 'Progressing'),
         (STATE_ERROR, 'Error'),
-        (STATE_WARNING, 'Warning'),
         (STATE_COMPLETE, 'Complete'),
     )
     ACTIVE_STATES = (STATE_SUBMITTED, STATE_PROGRESSING)

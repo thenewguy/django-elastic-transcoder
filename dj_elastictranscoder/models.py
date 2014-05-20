@@ -4,13 +4,20 @@ from django.contrib.contenttypes.generic import GenericForeignKey
 
 
 class EncodeJob(models.Model):
+    STATE_SUBMITTED = 0
+    STATE_PROGRESSING = 1
+    STATE_ERROR = 2
+    STATE_WARNING = 3
+    STATE_COMPLETE = 4
     STATE_CHOICES = (
-        (0, 'Submitted'),
-        (1, 'Progressing'),
-        (2, 'Error'),
-        (3, 'Warning'),
-        (4, 'Complete'),
+        (STATE_SUBMITTED, 'Submitted'),
+        (STATE_PROGRESSING, 'Progressing'),
+        (STATE_ERROR, 'Error'),
+        (STATE_WARNING, 'Warning'),
+        (STATE_COMPLETE, 'Complete'),
     )
+    ACTIVE_STATES = (STATE_SUBMITTED, STATE_PROGRESSING)
+    
     id = models.CharField(max_length=100, primary_key=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()

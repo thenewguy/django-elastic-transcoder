@@ -54,14 +54,14 @@ def endpoint(request):
         if message['state'] == 'PROGRESSING':
             job = EncodeJob.objects.get(pk=message['jobId'])
             job.message = 'Progress'
-            job.state = 1
+            job.state = job.STATE_PROGRESSING
             job.save()
     
             transcode_onprogress.send(sender=None, job=job, message=message)
         elif message['state'] == 'COMPLETED':
             job = EncodeJob.objects.get(pk=message['jobId'])
             job.message = 'Success'
-            job.state = 4
+            job.state = job.STATE_COMPLETE
             job.save()
     
             transcode_oncomplete.send(sender=None, job=job, message=message)
@@ -74,7 +74,7 @@ def endpoint(request):
                 for output in message["outputs"]:
                     details.append(output["statusDetail"])
                 job.message = json.dumps(details)
-            job.state = 2
+            job.state = job.STATE_ERROR
             job.save()
     
             transcode_onerror.send(sender=None, job=job, message=message)

@@ -20,9 +20,10 @@ def endpoint(request):
     """
     Receive SNS notification
     """
+    request_data = request.read()
     try:
         try:
-            data = json.loads(request.read())
+            data = json.loads(request_data)
         except ValueError:
             return HttpResponseBadRequest('Invalid JSON')
     
@@ -74,5 +75,5 @@ def endpoint(request):
     
         return HttpResponse('Done')
     except Exception, e:
-        logger.exception("'%s' exception was raised processing the endpoint view." % e.__class__.__name__)
+        logger.exception("'%s' exception was raised processing the endpoint view. Posted data was as follows: '%s'" % (e.__class__.__name__, request_data))
         raise

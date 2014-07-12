@@ -67,7 +67,13 @@ def endpoint(request):
             transcode_oncomplete.send(sender=None, job=job, message=message)
         elif message['state'] == 'ERROR':
             job = EncodeJob.objects.get(pk=message['jobId'])
-            job.message = message['messageDetails']
+            try:
+                job.message = message['messageDetails']
+            except KeyError:
+                details = []
+                for output in message["outputs"]:
+                    details.append(output["statusDetail"])
+                job.message = json.dumps(details)
             job.state = 2
             job.save()
     

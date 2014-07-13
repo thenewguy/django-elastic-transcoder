@@ -33,13 +33,13 @@ class Transcoder(object):
             assert False, 'Please provide AWS_REGION'
 
 
-    def encode(self, input_name, outputs):
+    def encode(self, input_name, outputs, playlists=None):
         encoder = elastictranscoder.connect_to_region(
             self.aws_region, 
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key)
 
-        self.message = encoder.create_job(self.pipeline_id, input_name, outputs=outputs)
+        self.message = encoder.create_job(self.pipeline_id, input_name, outputs=outputs, playlists=playlists)
 
 
     def create_job_for_object(self, obj):
